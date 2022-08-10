@@ -19,6 +19,12 @@ import Foundation
     /// Model to render.
     public var modelId: Value<String>?
 
+    /// Intensity of the ambient occlusion if present in the 3D model.
+    public var modelAmbientOcclusionIntensity: Value<Double>?
+
+    /// Transition options for `modelAmbientOcclusionIntensity`.
+    public var modelAmbientOcclusionIntensityTransition: StyleTransition?
+
     /// Enable/Disable shadow casting for this layer
     public var modelCastShadows: Value<Bool>?
 
@@ -39,6 +45,9 @@ import Foundation
 
     /// Transition options for `modelOpacity`.
     public var modelOpacityTransition: StyleTransition?
+
+    /// Enable/Disable shadow receiving for this layer
+    public var modelReceiveShadows: Value<Bool>?
 
     /// The rotation of the model in euler angles [lon, lat, z].
     public var modelRotation: Value<[Double]>?
@@ -78,6 +87,8 @@ import Foundation
         try container.encodeIfPresent(maxZoom, forKey: .maxZoom)
 
         var paintContainer = container.nestedContainer(keyedBy: PaintCodingKeys.self, forKey: .paint)
+        try paintContainer.encodeIfPresent(modelAmbientOcclusionIntensity, forKey: .modelAmbientOcclusionIntensity)
+        try paintContainer.encodeIfPresent(modelAmbientOcclusionIntensityTransition, forKey: .modelAmbientOcclusionIntensityTransition)
         try paintContainer.encodeIfPresent(modelCastShadows, forKey: .modelCastShadows)
         try paintContainer.encodeIfPresent(modelColor, forKey: .modelColor)
         try paintContainer.encodeIfPresent(modelColorTransition, forKey: .modelColorTransition)
@@ -85,6 +96,7 @@ import Foundation
         try paintContainer.encodeIfPresent(modelColorMixIntensityTransition, forKey: .modelColorMixIntensityTransition)
         try paintContainer.encodeIfPresent(modelOpacity, forKey: .modelOpacity)
         try paintContainer.encodeIfPresent(modelOpacityTransition, forKey: .modelOpacityTransition)
+        try paintContainer.encodeIfPresent(modelReceiveShadows, forKey: .modelReceiveShadows)
         try paintContainer.encodeIfPresent(modelRotation, forKey: .modelRotation)
         try paintContainer.encodeIfPresent(modelRotationTransition, forKey: .modelRotationTransition)
         try paintContainer.encodeIfPresent(modelScale, forKey: .modelScale)
@@ -109,6 +121,8 @@ import Foundation
         maxZoom = try container.decodeIfPresent(Double.self, forKey: .maxZoom)
 
         if let paintContainer = try? container.nestedContainer(keyedBy: PaintCodingKeys.self, forKey: .paint) {
+            modelAmbientOcclusionIntensity = try paintContainer.decodeIfPresent(Value<Double>.self, forKey: .modelAmbientOcclusionIntensity)
+            modelAmbientOcclusionIntensityTransition = try paintContainer.decodeIfPresent(StyleTransition.self, forKey: .modelAmbientOcclusionIntensityTransition)
             modelCastShadows = try paintContainer.decodeIfPresent(Value<Bool>.self, forKey: .modelCastShadows)
             modelColor = try paintContainer.decodeIfPresent(Value<StyleColor>.self, forKey: .modelColor)
             modelColorTransition = try paintContainer.decodeIfPresent(StyleTransition.self, forKey: .modelColorTransition)
@@ -116,6 +130,7 @@ import Foundation
             modelColorMixIntensityTransition = try paintContainer.decodeIfPresent(StyleTransition.self, forKey: .modelColorMixIntensityTransition)
             modelOpacity = try paintContainer.decodeIfPresent(Value<Double>.self, forKey: .modelOpacity)
             modelOpacityTransition = try paintContainer.decodeIfPresent(StyleTransition.self, forKey: .modelOpacityTransition)
+            modelReceiveShadows = try paintContainer.decodeIfPresent(Value<Bool>.self, forKey: .modelReceiveShadows)
             modelRotation = try paintContainer.decodeIfPresent(Value<[Double]>.self, forKey: .modelRotation)
             modelRotationTransition = try paintContainer.decodeIfPresent(StyleTransition.self, forKey: .modelRotationTransition)
             modelScale = try paintContainer.decodeIfPresent(Value<[Double]>.self, forKey: .modelScale)
@@ -149,6 +164,8 @@ import Foundation
     }
 
     enum PaintCodingKeys: String, CodingKey {
+        case modelAmbientOcclusionIntensity = "model-ambient-occlusion-intensity"
+        case modelAmbientOcclusionIntensityTransition = "model-ambient-occlusion-intensity-transition"
         case modelCastShadows = "model-cast-shadows"
         case modelColor = "model-color"
         case modelColorTransition = "model-color-transition"
@@ -156,6 +173,7 @@ import Foundation
         case modelColorMixIntensityTransition = "model-color-mix-intensity-transition"
         case modelOpacity = "model-opacity"
         case modelOpacityTransition = "model-opacity-transition"
+        case modelReceiveShadows = "model-receive-shadows"
         case modelRotation = "model-rotation"
         case modelRotationTransition = "model-rotation-transition"
         case modelScale = "model-scale"
