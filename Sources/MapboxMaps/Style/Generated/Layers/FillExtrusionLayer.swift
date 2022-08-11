@@ -19,7 +19,7 @@ public struct FillExtrusionLayer: Layer {
     public var visibility: Value<Visibility>?
 
     /// Radius of a fill extrusion edge in meters. If not zero, rounds extrusion edges for a smoother appearance.
-    public var fillExtrusionEdgeRadius: Value<Double>?
+    @_spi(Experimental) public var fillExtrusionEdgeRadius: Value<Double>?
 
     /// Controls the intensity of ambient occlusion (AO) shading. Current AO implementation is a low-cost best-effort approach that shades area near ground and concave angles between walls. Default value 0.0 disables ambient occlusion and values around 0.3 provide the most plausible results for buildings.
     public var fillExtrusionAmbientOcclusionIntensity: Value<Double>?
