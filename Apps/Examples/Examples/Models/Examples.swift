@@ -55,10 +55,6 @@ struct Examples {
         ],
         [   "title": "Globe and Atmosphere",
             "examples": globeAndAtmosphere
-        ],
-        [
-            "title": "Experimental",
-            "examples": experimentalExamples
         ]
     ]
 
@@ -145,7 +141,7 @@ struct Examples {
                 type: ViewAnnotationMarkerExample.self)
     ]
 
-    // Examples that focus on setting, animating, or otherwise changing the map's camera.
+    // Examples that focus on setting, animating, or otherwise changing the map's camera and viewport.
     static let cameraExamples = [
             Example(title: "Use custom camera animations",
                 description: """
@@ -155,6 +151,12 @@ struct Examples {
         Example(title: "Use camera animations",
                 description: "Use ease(to:) to animate updates to the camera's position.",
                 type: CameraAnimationExample.self),
+        Example(title: "Viewport",
+                description: "Viewport camera showcase",
+                type: ViewportExample.self),
+        Example(title: "Advanced Viewport Gestures",
+                description: "Viewport configured to allow gestures",
+                type: AdvancedViewportGesturesExample.self),
 
     ]
 
@@ -165,7 +167,7 @@ struct Examples {
                 type: ResizableImageExample.self)
     ]
 
-    // Examples focused on displaying the user's location.
+    // Examples that focus on displaying the user's location.
     public static let locationExamples = [
         Example(title: "Display the user's location",
                 description: "Display the user's location on a map with the default user location puck.",
@@ -296,6 +298,7 @@ struct Examples {
                 type: SymbolClusteringExample.self),
     ]
 
+    // Examples that show map accessibility features
     static let accessibilityExamples = [
         Example(title: "Access map features using VoiceOver",
                 description: "Use VoiceOver to highlight annotations and hear their associated features.",
@@ -316,15 +319,5 @@ struct Examples {
         Example(title: "Visualize data as a heatmap",
                 description: "Display your heatmap using the globe projection.",
                 type: HeatmapLayerGlobeExample.self)
-    ]
-
-    // Examples that uses experimental APIs
-    static let experimentalExamples = [
-        Example(title: "Viewport",
-                description: "Viewport camera showcase",
-                type: ViewportExample.self),
-        Example(title: "Advanced Viewport Gestures",
-                description: "Viewport configured to allow gestures",
-                type: AdvancedViewportGesturesExample.self),
     ]
 }
