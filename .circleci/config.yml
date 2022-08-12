@@ -135,22 +135,22 @@ workflows:
           requires:
             - build-sdk-for-api-compatibility-check
       - create-xcframework
-      - validate-integrations-for-branch
+#      - validate-integrations-for-branch
 
       # Trigger mobile-metrics workflows
-      - trigger-metrics-v2
-      - trigger-binary-size:
-          requires:
-            - build-sdk
-      - trigger-metrics-build:
-          requires:
-            - build-sdk
-      - trigger-metrics-collection:
-          requires:
-            - build-sdk
-          filters:
-            branches:
-              only: main
+#      - trigger-metrics-v2
+#      - trigger-binary-size:
+#          requires:
+#            - build-sdk
+#      - trigger-metrics-build:
+#          requires:
+#            - build-sdk
+#      - trigger-metrics-collection:
+#          requires:
+#            - build-sdk
+#          filters:
+#            branches:
+#              only: main
 
       # Run unit tests on CI simulator
       - unit-test-sdk:
@@ -478,11 +478,11 @@ jobs:
           path: MapboxMapsTests.xcresult.zip
       - locate-derived-data-directory:
           base_name: $(basename $(pwd))
-      - run:
-          name: Converting and uploading coverage
-          command: |
-            pip3 install awscli gitpython
-            make update-codecov-with-profdata SCHEME=MapboxMaps BUILD_DIR="$DERIVED_DATA_PATH"
+#      - run:
+#          name: Converting and uploading coverage
+#          command: |
+#            pip3 install awscli gitpython
+#            make update-codecov-with-profdata SCHEME=MapboxMaps BUILD_DIR="$DERIVED_DATA_PATH"
       - store-logs:
           artifact_name: MapboxMaps
           derived_data_path: $DERIVED_DATA_PATH
