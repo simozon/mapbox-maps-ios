@@ -15,7 +15,7 @@ orbs:
 release-precheck: &release-anchor
   filters:
     tags:
-      only: /^v[0-9]+\.[0-9]+\.[0-9]+.*/
+      only: /^v[0-9]+\.[0-9]+\.[0-9]+.*-private/
     branches:
       ignore: /.*/
   requires:
@@ -195,16 +195,16 @@ workflows:
       - release-precheck:
           <<: *release-anchor
           requires: []
-      - trigger-metrics-v2:
-          <<: *release-anchor
+#      - trigger-metrics-v2:
+#          <<: *release-anchor
       - build-dynamic:
           <<: *release-anchor
-      - build-static:
-          <<: *release-anchor
-      - build-docs:
-          <<: *release-anchor
-      - build-studio-preview:
-          <<: *release-anchor
+#      - build-static:
+#          <<: *release-anchor
+#      - build-docs:
+#          <<: *release-anchor
+#      - build-studio-preview:
+#          <<: *release-anchor
       - check-api-compatibility:
           <<: *release-anchor
           requires:
@@ -212,9 +212,9 @@ workflows:
       - create-registry-pr:
           <<: *release-anchor
           requires:
-            - build-static
-            - build-docs
-            - build-studio-preview
+#            - build-static
+#            - build-docs
+#            - build-studio-preview
             - check-api-compatibility
       - wait-registry-pr:
           <<: *release-anchor
@@ -225,28 +225,28 @@ workflows:
           <<: *release-anchor
           requires:
             - wait-registry-pr
-      - create-docs-prs:
-          <<: *release-anchor
-          requires:
-            - check-registry
-      - update-examples:
-          <<: *release-anchor
-          requires:
-            - check-registry
-      - publish-podspec:
-          <<: *release-anchor
-          requires:
-            - check-registry
-      - validate-integrations:
-          <<: *release-anchor
-          requires:
-            - publish-podspec
-      - create-draft-release:
-          <<: *release-anchor
-          requires:
-            - create-docs-prs
-            - update-examples
-            - validate-integrations
+#      - create-docs-prs:
+#          <<: *release-anchor
+#          requires:
+#            - check-registry
+#      - update-examples:
+#          <<: *release-anchor
+#          requires:
+#            - check-registry
+#      - publish-podspec:
+#          <<: *release-anchor
+#          requires:
+#            - check-registry
+#      - validate-integrations:
+#          <<: *release-anchor
+#          requires:
+#            - publish-podspec
+#      - create-draft-release:
+#          <<: *release-anchor
+#          requires:
+#            - create-docs-prs
+#            - update-examples
+#            - validate-integrations
 
   turf-integration:
     when: << pipeline.parameters.turf-revision >>
@@ -710,13 +710,13 @@ jobs:
     steps:
       - checkout
       - parse-release-version-if-available
-      - run:
-          name: Podspec points to the release version
-          command: '[[ $(pod ipc spec  MapboxMaps.podspec | jq -r .version) == "$VERSION" ]]'
+#      - run:
+#          name: Podspec points to the release version
+#          command: '[[ $(pod ipc spec  MapboxMaps.podspec | jq -r .version) == "$VERSION" ]]'
       - inject-netrc-credentials
-      - run:
-          name: General podspec check
-          command: pod spec lint --verbose --allow-warnings
+#      - run:
+#          name: General podspec check
+#          command: pod spec lint --verbose --allow-warnings
       - slack-notify-failure-if-any
 
   build-dynamic:
@@ -737,7 +737,7 @@ jobs:
             - MapboxMaps.zip
       - run:
           name: Upload to S3
-          command: scripts/release/upload-to-registry.sh scripts/release/packager/MapboxMaps.zip mobile-maps-ios "$VERSION" MapboxMaps.zip
+          command: scripts/release/upload-to-registry.sh scripts/release/packager/MapboxMaps.zip mobile-maps-ios-privatebeta "$VERSION" MapboxMaps.zip
       - slack-notify-failure-if-any
 
   build-static:
@@ -786,7 +786,7 @@ jobs:
       - run: ls -lGA workspace
       - run:
           name: Create SDK Registry PR
-          command: scripts/release/create-api-downloads-pr.sh mobile-maps-ios "$VERSION"
+          command: scripts/release/create-api-downloads-pr.sh mobile-maps-ios-privatebeta "$VERSION"
       - slack-notify-failure-if-any
 
   check-registry:
@@ -799,7 +799,7 @@ jobs:
           name: Wait binaries public access
           command: |
             echo $VERSION
-            timeout 3600 bash -c 'while [[ "$(curl -n -s -o /dev/null -w ''%{http_code}'' https://api.mapbox.com/downloads/v2/mobile-maps-ios/releases/ios/$VERSION/MapboxMaps.zip)" != "200" ]]; do sleep 5; done' || false
+            timeout 3600 bash -c 'while [[ "$(curl -n -s -o /dev/null -w ''%{http_code}'' https://api.mapbox.com/downloads/v2/mobile-maps-ios-private/releases/ios/$VERSION/MapboxMaps.zip)" != "200" ]]; do sleep 5; done' || false
           no_output_timeout: 60m
       - slack-notify-failure-if-any
 
