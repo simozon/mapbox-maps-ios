@@ -5,6 +5,9 @@ parameters:
   turf-revision:
     type: string
     default: ""
+  mapbox_sync_branch:
+    type: string
+    default: ""
 
 orbs:
   # https://circleci.com/orbs/registry/orb/circleci/slack
@@ -254,6 +257,12 @@ workflows:
       - turf-integration:
           name: "Run Unit Tests"
           turf-revision: << pipeline.parameters.turf-revision >>
+
+  sync-with-public-repo:
+    when: << pipeline.parameters.mapbox_sync_branch >>
+    jobs:
+      - sync-with-public-repo:
+          sync_branch: << pipeline.parameters.mapbox_sync_branch >>
 
 # ==============================================================================
 
@@ -915,6 +924,27 @@ jobs:
           turf-revision: << parameters.turf-revision >>
       - turf-report-failure:
           turf-revision: << parameters.turf-revision >>
+
+  sync-with-public-repo:
+    executor: xcode-latest
+    parameters:
+      sync_branch:
+        default: main
+        type: string
+    steps:
+      - checkout
+      - configure-environment
+      - run:
+          name: Set git user name
+          command: |
+            git config --global user.email "mapbox-ci@users.noreply.github.com"
+            git config --global user.name "mapbox-ci"
+      - run:
+          name: Sync the << parameters.sync_branch >> branch from the public repo
+          command: ./scripts/public-sync/ci-sync-with-public-repo.sh << parameters.sync_branch >>
+      - run:
+          name: Create a PR to merge the << parameters.sync_branch >> branch with the private counterpart
+          command: ./scripts/public-sync/ci-create-pr-from-public-repo.sh << parameters.sync_branch >>
 
 # ==============================================================================
 # Reusable commands
