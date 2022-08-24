@@ -13,7 +13,7 @@ readonly BRANCH=$1
 
 if [[ -z $BRANCH ]]
 then
-  echo "Usage : ./ci-sync-with-public.sh <branch name to sync>"
+  echo "Usage : ./ci-create-pr-from-public-repo.sh <branch name to sync>"
   exit 1
 fi
 
