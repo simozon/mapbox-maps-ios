@@ -553,13 +553,13 @@ jobs:
               zip -r crashlogs.zip CrashLogs
             ) || true
           when: always
-      - run:
-          name: Update coverage
-          command: |
-            make update-codecov-with-profdata \
-                COVERAGE_ARCH=arm64 \
-                COVERAGE_ROOT_DIR="$(pwd)/testlab_results" \
-                COVERAGE_MAPBOX_MAPS="$(pwd)/testlab_results/Release-iphoneos/MapboxMaps.o" SCHEME=<< parameters.scheme >>
+#      - run:
+#          name: Update coverage
+#          command: |
+#            make update-codecov-with-profdata \
+#                COVERAGE_ARCH=arm64 \
+#                COVERAGE_ROOT_DIR="$(pwd)/testlab_results" \
+#                COVERAGE_MAPBOX_MAPS="$(pwd)/testlab_results/Release-iphoneos/MapboxMaps.o" SCHEME=<< parameters.scheme >>
       - run:
           name: Parsing xcresults for errors
           command: |
