@@ -1,5 +1,5 @@
 import XCTest
-@_spi(Experimental) @testable import MapboxMaps
+@testable import MapboxMaps
 
 final class Puck3DTests: XCTestCase {
 
@@ -235,7 +235,7 @@ final class Puck3DTests: XCTestCase {
 
     func testDefaultModelScale() throws {
         let stubbedModelScale = 1.0
-        configuration.modelScale = .constant([stubbedModelScale, stubbedModelScale, stubbedModelScale])
+        configuration.modelScale = .random(.constant([stubbedModelScale, stubbedModelScale, stubbedModelScale]))
 
         recreatePuck()
 
