@@ -32,7 +32,7 @@ executors:
   # Please keep them in sync if this structure changes.
   xcode-sdk-min:
     macos:
-      xcode: 13.0.0
+      xcode: 13.1.0
 
 ### Workflows
 
@@ -46,7 +46,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - internal
     jobs:
       - swiftlint
       - depsvalidator:
@@ -56,13 +56,13 @@ workflows:
           report_failure: true
           matrix:
             parameters:
-              xcode: ["13.0.0", "13.2.1"]
+              xcode: ["13.1.0", "13.2.1"]
       - unit-test-sdk:
           configuration: "Release"
           report_failure: true
           matrix:
             parameters:
-              xcode: ["13.0.0", "13.2.1"]
+              xcode: ["13.1.0", "13.2.1"]
       - build-tests:
           name: Build MapboxTestHost tests
       - run-tests:
@@ -80,7 +80,7 @@ workflows:
       - create-xcframework:
           create-xcframework-always-run: true
           report_failure: true
-          xcode: "13.0.0"
+          xcode: "13.1.0"
 
   optional-tests:
     unless: << pipeline.parameters.turf-revision >>
@@ -130,7 +130,7 @@ workflows:
       - depsvalidator:
           xcode: "13.3.0"
       - build-sdk:
-          xcode: "13.0.0"
+          xcode: "13.1.0"
           configuration: "Release"
 
       - build-sdk-for-api-compatibility-check
@@ -158,11 +158,11 @@ workflows:
       # Run unit tests on CI simulator
       - unit-test-sdk:
           name: "Run Unit tests"
-          xcode: "13.0.0"
+          xcode: "13.1.0"
 
       - unit-test-sdk:
           name: "Run Unit Tests with min Turf"
-          xcode: "13.0.0"
+          xcode: "13.1.0"
           turf-revision: v2.0.0
 
       # Build all tests with host application
@@ -275,7 +275,7 @@ jobs:
     parameters:
       xcode:
         type: string
-        default: "13.0.0"
+        default: "13.1.0"
       create-xcframework-always-run:
         type: boolean
         default: false
@@ -562,13 +562,13 @@ jobs:
               zip -r crashlogs.zip CrashLogs
             ) || true
           when: always
-      - run:
-          name: Update coverage
-          command: |
-            make update-codecov-with-profdata \
-                COVERAGE_ARCH=arm64 \
-                COVERAGE_ROOT_DIR="$(pwd)/testlab_results" \
-                COVERAGE_MAPBOX_MAPS="$(pwd)/testlab_results/Release-iphoneos/MapboxMaps.o" SCHEME=<< parameters.scheme >>
+#      - run:
+#          name: Update coverage
+#          command: |
+#            make update-codecov-with-profdata \
+#                COVERAGE_ARCH=arm64 \
+#                COVERAGE_ROOT_DIR="$(pwd)/testlab_results" \
+#                COVERAGE_MAPBOX_MAPS="$(pwd)/testlab_results/Release-iphoneos/MapboxMaps.o" SCHEME=<< parameters.scheme >>
       - run:
           name: Parsing xcresults for errors
           command: |
@@ -620,7 +620,7 @@ jobs:
             condition:
               not:
                 matches:
-                  pattern: "^13.0.*$"
+                  pattern: "^13.1.*$"
                   value: << parameters.xcode >>
             steps:
               - check-breaking-api:
@@ -634,7 +634,7 @@ jobs:
             condition:
               not:
                 matches:
-                  pattern: "^13.0.*$"
+                  pattern: "^13.1.*$"
                   value: << parameters.xcode >>
             steps:
               - check-breaking-api:
@@ -885,7 +885,7 @@ jobs:
         type: string
         default: ""
     macos:
-      xcode: "13.0.0"
+      xcode: "13.1.0"
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
       HOMEBREW_NO_INSTALL_CLEANUP: 1
