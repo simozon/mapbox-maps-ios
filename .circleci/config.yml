@@ -737,7 +737,7 @@ jobs:
             - MapboxMaps.zip
       - run:
           name: Upload to S3
-          command: scripts/release/upload-to-registry.sh scripts/release/packager/MapboxMaps.zip mobile-maps-ios-privatebeta "$VERSION" MapboxMaps.zip
+          command: scripts/release/upload-to-registry.sh scripts/release/packager/MapboxMaps.zip mobile-maps-ios-privatepreview "$VERSION" MapboxMaps.zip
       - slack-notify-failure-if-any
 
   build-static:
@@ -786,7 +786,7 @@ jobs:
       - run: ls -lGA workspace
       - run:
           name: Create SDK Registry PR
-          command: scripts/release/create-api-downloads-pr.sh mobile-maps-ios-privatebeta "$VERSION"
+          command: scripts/release/create-api-downloads-pr.sh mobile-maps-ios-privatepreview "$VERSION"
       - slack-notify-failure-if-any
 
   check-registry:
