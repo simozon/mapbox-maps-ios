@@ -5,6 +5,9 @@ parameters:
   turf-revision:
     type: string
     default: ""
+  mapbox_sync_branch:
+    type: string
+    default: ""
 
 orbs:
   # https://circleci.com/orbs/registry/orb/circleci/slack
@@ -15,7 +18,7 @@ orbs:
 release-precheck: &release-anchor
   filters:
     tags:
-      only: /^v[0-9]+\.[0-9]+\.[0-9]+.*/
+      only: /^v[0-9]+\.[0-9]+\.[0-9]+.*-private/
     branches:
       ignore: /.*/
   requires:
@@ -43,7 +46,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - internal
     jobs:
       - swiftlint
       - depsvalidator:
@@ -135,22 +138,22 @@ workflows:
           requires:
             - build-sdk-for-api-compatibility-check
       - create-xcframework
-      - validate-integrations-for-branch
+#      - validate-integrations-for-branch
 
       # Trigger mobile-metrics workflows
-      - trigger-metrics-v2
-      - trigger-binary-size:
-          requires:
-            - build-sdk
-      - trigger-metrics-build:
-          requires:
-            - build-sdk
-      - trigger-metrics-collection:
-          requires:
-            - build-sdk
-          filters:
-            branches:
-              only: main
+#      - trigger-metrics-v2
+#      - trigger-binary-size:
+#          requires:
+#            - build-sdk
+#      - trigger-metrics-build:
+#          requires:
+#            - build-sdk
+#      - trigger-metrics-collection:
+#          requires:
+#            - build-sdk
+#          filters:
+#            branches:
+#              only: main
 
       # Run unit tests on CI simulator
       - unit-test-sdk:
@@ -202,16 +205,16 @@ workflows:
       - release-precheck:
           <<: *release-anchor
           requires: []
-      - trigger-metrics-v2:
-          <<: *release-anchor
+#      - trigger-metrics-v2:
+#          <<: *release-anchor
       - build-dynamic:
           <<: *release-anchor
-      - build-static:
-          <<: *release-anchor
-      - build-docs:
-          <<: *release-anchor
-      - build-studio-preview:
-          <<: *release-anchor
+#      - build-static:
+#          <<: *release-anchor
+#      - build-docs:
+#          <<: *release-anchor
+#      - build-studio-preview:
+#          <<: *release-anchor
       - check-api-compatibility:
           <<: *release-anchor
           requires:
@@ -219,9 +222,9 @@ workflows:
       - create-registry-pr:
           <<: *release-anchor
           requires:
-            - build-static
-            - build-docs
-            - build-studio-preview
+#            - build-static
+#            - build-docs
+#            - build-studio-preview
             - check-api-compatibility
       - wait-registry-pr:
           <<: *release-anchor
@@ -232,28 +235,28 @@ workflows:
           <<: *release-anchor
           requires:
             - wait-registry-pr
-      - create-docs-prs:
-          <<: *release-anchor
-          requires:
-            - check-registry
-      - update-examples:
-          <<: *release-anchor
-          requires:
-            - check-registry
-      - publish-podspec:
-          <<: *release-anchor
-          requires:
-            - check-registry
-      - validate-integrations:
-          <<: *release-anchor
-          requires:
-            - publish-podspec
-      - create-draft-release:
-          <<: *release-anchor
-          requires:
-            - create-docs-prs
-            - update-examples
-            - validate-integrations
+#      - create-docs-prs:
+#          <<: *release-anchor
+#          requires:
+#            - check-registry
+#      - update-examples:
+#          <<: *release-anchor
+#          requires:
+#            - check-registry
+#      - publish-podspec:
+#          <<: *release-anchor
+#          requires:
+#            - check-registry
+#      - validate-integrations:
+#          <<: *release-anchor
+#          requires:
+#            - publish-podspec
+#      - create-draft-release:
+#          <<: *release-anchor
+#          requires:
+#            - create-docs-prs
+#            - update-examples
+#            - validate-integrations
 
   turf-integration:
     when: << pipeline.parameters.turf-revision >>
@@ -261,6 +264,12 @@ workflows:
       - turf-integration:
           name: "Run Unit Tests"
           turf-revision: << pipeline.parameters.turf-revision >>
+
+  sync-with-public-repo:
+    when: << pipeline.parameters.mapbox_sync_branch >>
+    jobs:
+      - sync-with-public-repo:
+          sync_branch: << pipeline.parameters.mapbox_sync_branch >>
 
 # ==============================================================================
 
@@ -485,11 +494,11 @@ jobs:
           path: MapboxMapsTests.xcresult.zip
       - locate-derived-data-directory:
           base_name: $(basename $(pwd))
-      - run:
-          name: Converting and uploading coverage
-          command: |
-            pip3 install awscli gitpython
-            make update-codecov-with-profdata SCHEME=MapboxMaps BUILD_DIR="$DERIVED_DATA_PATH"
+#      - run:
+#          name: Converting and uploading coverage
+#          command: |
+#            pip3 install awscli gitpython
+#            make update-codecov-with-profdata SCHEME=MapboxMaps BUILD_DIR="$DERIVED_DATA_PATH"
       - store-logs:
           artifact_name: MapboxMaps
           derived_data_path: $DERIVED_DATA_PATH
@@ -560,13 +569,13 @@ jobs:
               zip -r crashlogs.zip CrashLogs
             ) || true
           when: always
-      - run:
-          name: Update coverage
-          command: |
-            make update-codecov-with-profdata \
-                COVERAGE_ARCH=arm64 \
-                COVERAGE_ROOT_DIR="$(pwd)/testlab_results" \
-                COVERAGE_MAPBOX_MAPS="$(pwd)/testlab_results/Release-iphoneos/MapboxMaps.o" SCHEME=<< parameters.scheme >>
+#      - run:
+#          name: Update coverage
+#          command: |
+#            make update-codecov-with-profdata \
+#                COVERAGE_ARCH=arm64 \
+#                COVERAGE_ROOT_DIR="$(pwd)/testlab_results" \
+#                COVERAGE_MAPBOX_MAPS="$(pwd)/testlab_results/Release-iphoneos/MapboxMaps.o" SCHEME=<< parameters.scheme >>
       - run:
           name: Parsing xcresults for errors
           command: |
@@ -717,13 +726,13 @@ jobs:
     steps:
       - checkout
       - parse-release-version-if-available
-      - run:
-          name: Podspec points to the release version
-          command: '[[ $(pod ipc spec  MapboxMaps.podspec | jq -r .version) == "$VERSION" ]]'
+#      - run:
+#          name: Podspec points to the release version
+#          command: '[[ $(pod ipc spec  MapboxMaps.podspec | jq -r .version) == "$VERSION" ]]'
       - inject-netrc-credentials
-      - run:
-          name: General podspec check
-          command: pod spec lint --verbose --allow-warnings
+#      - run:
+#          name: General podspec check
+#          command: pod spec lint --verbose --allow-warnings
       - slack-notify-failure-if-any
 
   build-dynamic:
@@ -744,7 +753,7 @@ jobs:
             - MapboxMaps.zip
       - run:
           name: Upload to S3
-          command: scripts/release/upload-to-registry.sh scripts/release/packager/MapboxMaps.zip mobile-maps-ios "$VERSION" MapboxMaps.zip
+          command: scripts/release/upload-to-registry.sh scripts/release/packager/MapboxMaps.zip mobile-maps-ios-privatebeta "$VERSION" MapboxMaps.zip
       - slack-notify-failure-if-any
 
   build-static:
@@ -793,7 +802,7 @@ jobs:
       - run: ls -lGA workspace
       - run:
           name: Create SDK Registry PR
-          command: scripts/release/create-api-downloads-pr.sh mobile-maps-ios "$VERSION"
+          command: scripts/release/create-api-downloads-pr.sh mobile-maps-ios-privatebeta "$VERSION"
       - slack-notify-failure-if-any
 
   check-registry:
@@ -806,7 +815,7 @@ jobs:
           name: Wait binaries public access
           command: |
             echo $VERSION
-            timeout 3600 bash -c 'while [[ "$(curl -n -s -o /dev/null -w ''%{http_code}'' https://api.mapbox.com/downloads/v2/mobile-maps-ios/releases/ios/$VERSION/MapboxMaps.zip)" != "200" ]]; do sleep 5; done' || false
+            timeout 3600 bash -c 'while [[ "$(curl -n -s -o /dev/null -w ''%{http_code}'' https://api.mapbox.com/downloads/v2/mobile-maps-ios-private/releases/ios/$VERSION/MapboxMaps.zip)" != "200" ]]; do sleep 5; done' || false
           no_output_timeout: 60m
       - slack-notify-failure-if-any
 
@@ -923,23 +932,26 @@ jobs:
       - turf-report-failure:
           turf-revision: << parameters.turf-revision >>
 
-  trigger-internal-ci-sync:
-    docker:
-      - image: cimg/base:stable
+  sync-with-public-repo:
+    executor: xcode-latest
+    parameters:
+      sync_branch:
+        default: main
+        type: string
     steps:
       - checkout
+      - configure-environment
       - run:
-          name: Notify maps internal CI about $CIRCLE_BRANCH branch update
+          name: Set git user name
           command: |
-            curl -X POST "https://circleci.com/api/v2/project/github/mapbox/mapbox-maps-ios-private/pipeline" \
-                -H 'Content-Type: application/json' \
-                -H "Circle-Token: $CIRCLECI_API_TOKEN_MAPBOX_MAPS_IOS_INTERNAL" \
-                -d $'{
-                        "branch": "internal",
-                        "parameters": {
-                          "mapbox_sync_branch": "$CIRCLE_BRANCH"
-                        }
-                      }'
+            git config --global user.email "mapbox-ci@users.noreply.github.com"
+            git config --global user.name "mapbox-ci"
+      - run:
+          name: Sync the << parameters.sync_branch >> branch from the public repo
+          command: ./scripts/public-sync/ci-sync-with-public-repo.sh << parameters.sync_branch >>
+      - run:
+          name: Create a PR to merge the << parameters.sync_branch >> branch with the private counterpart
+          command: ./scripts/public-sync/ci-create-pr-from-public-repo.sh << parameters.sync_branch >>
 
 # ==============================================================================
 # Reusable commands
