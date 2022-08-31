@@ -193,13 +193,6 @@ workflows:
             branches:
               only: main
 
-      # Notify internal CI about main and release branch updates
-      - trigger-internal-ci-sync:
-          filters:
-            branches:
-              only:
-                - main
-                - /^release/v10.*/
   release:
     jobs:
       - release-precheck:
