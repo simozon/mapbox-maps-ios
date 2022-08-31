@@ -15,7 +15,7 @@ COMMIT_SHA=$(git rev-parse --abbrev-ref HEAD)
 readonly COMMIT_SHA
 
 # fetch public branch
-git remote add public-maps https://x-access-token:"$(mbx-ci github reader token))"@github.com/mapbox/mapbox-maps-ios.git
+git remote add public-maps https://x-access-token:"$(mbx-ci github reader token)"@github.com/mapbox/mapbox-maps-ios.git
 git remote set-url --push public-maps DISABLE
 git fetch public-maps "$BRANCH"
 
