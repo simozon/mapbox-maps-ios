@@ -247,22 +247,23 @@ COVERAGE_ARCH ?= x86_64
 
 .PHONY: update-codecov-with-profdata
 update-codecov-with-profdata:
-	@PROF_DATA=`find $(COVERAGE_ROOT_DIR) -regex '.*\.profdata'` ; \
-	for RESULT in $${PROF_DATA[@]} ; \
-	do \
-		echo "Generating lcov JSON" ; \
-		xcrun llvm-cov export \
-			$(COVERAGE_MAPBOX_MAPS) \
-			-instr-profile=$${RESULT} \
-			-arch=$(COVERAGE_ARCH) \
-			-format=text | python3 -m json.tool > $${RESULT}.json ; \
-		echo "Uploading to S3" ; \
-		python3 ./scripts/code-coverage/parse-code-coverage.py \
-			-g . \
-			-c MapboxMaps \
-			--scheme $(SCHEME) \
-			--report $${RESULT}.json ; \
-	done
+# @PROF_DATA=`find $(COVERAGE_ROOT_DIR) -regex '.*\.profdata'` ; \
+# for RESULT in $${PROF_DATA[@]} ; \
+# do \
+# 	echo "Generating lcov JSON" ; \
+# 	xcrun llvm-cov export \
+# 		$(COVERAGE_MAPBOX_MAPS) \
+# 		-instr-profile=$${RESULT} \
+# 		-arch=$(COVERAGE_ARCH) \
+# 		-format=text | python3 -m json.tool > $${RESULT}.json ; \
+# 	echo "Uploading to S3" ; \
+# 	python3 ./scripts/code-coverage/parse-code-coverage.py \
+# 		-g . \
+# 		-c MapboxMaps \
+# 		--scheme $(SCHEME) \
+# 		--report $${RESULT}.json ; \
+# done
+	@echo "Updating codecov temporary disabled due to missing AWS access"
 	@echo "Done"
 
 .PHONY: device-update-codecov-with-profdata
