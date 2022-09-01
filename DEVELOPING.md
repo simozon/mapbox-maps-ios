@@ -15,7 +15,7 @@ This project runs on Apple's Metal rendering framework. Prerequisites for
 running the test app in simulators:
 
 * macOS 10.15 or later
-* Xcode 12.5.1+
+* Xcode 13.1.0+
 
 This project:
 

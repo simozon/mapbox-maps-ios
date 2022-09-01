@@ -1,5 +1,5 @@
 import XCTest
-@testable import MapboxMaps
+@_spi(Experimental) @testable import MapboxMaps
 
 final class Puck3DTests: XCTestCase {
 
@@ -207,6 +207,30 @@ final class Puck3DTests: XCTestCase {
 
         let actualLayer = try XCTUnwrap(style.addPersistentLayerStub.invocations.first?.parameters.layer as? ModelLayer)
         XCTAssertEqual(actualLayer.modelRotation, configuration.modelRotation)
+    }
+
+    func testModelCastShadows() throws {
+        configuration.modelCastShadows = .constant(.random())
+        recreatePuck()
+        interpolatedLocationProducer.location = .random()
+        style.layerExistsStub.defaultReturnValue = false
+
+        puck3D.isActive = true
+
+        let actualLayer = try XCTUnwrap(style.addPersistentLayerStub.invocations.first?.parameters.layer as? ModelLayer)
+        XCTAssertEqual(actualLayer.modelCastShadows, configuration.modelCastShadows)
+    }
+
+    func testModelReceiveShadows() throws {
+        configuration.modelReceiveShadows = .constant(.random())
+        recreatePuck()
+        interpolatedLocationProducer.location = .random()
+        style.layerExistsStub.defaultReturnValue = false
+
+        puck3D.isActive = true
+
+        let actualLayer = try XCTUnwrap(style.addPersistentLayerStub.invocations.first?.parameters.layer as? ModelLayer)
+        XCTAssertEqual(actualLayer.modelReceiveShadows, configuration.modelReceiveShadows)
     }
 
     func testDefaultModelScale() throws {

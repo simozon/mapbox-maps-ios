@@ -10,7 +10,7 @@ use Mapbox Maps SDK v10 for iOS, which now runs on
 
 ### Requirements
 
-* Xcode 12
+* Xcode 13.1
 * A Mapbox account
 
 ### Project Setup
@@ -64,15 +64,15 @@ To add a new example, go through the following steps:
    import MapboxMaps
    import MapboxCoreMaps
    import MapboxCommon
-   
+
    @objc(OfflineMapExample) // This must refer to the file name
-   
+
    public class OfflineMapExample: UIViewController, ExampleProtocol {
-   
+
        override public func viewDidLoad() {
            super.viewDidLoad()
        }
-       
+
        // Allows the delegate to receive information about map events.
        mapView.on(.mapLoaded) { [weak self] _ in
            guard let self = self else { return }
@@ -85,8 +85,8 @@ To add a new example, go through the following steps:
    array, as illustrated below.
 
    ```swift
-   Example(title: "Download an offline map", 
-           description: "Download a map for use without a network connection.", 
+   Example(title: "Download an offline map",
+           description: "Download a map for use without a network connection.",
            type: "OfflineMapExample.self")
    ```
 
