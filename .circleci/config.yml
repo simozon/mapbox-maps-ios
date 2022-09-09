@@ -5,6 +5,9 @@ parameters:
   turf-revision:
     type: string
     default: ""
+  mapbox_sync_branch:
+    type: string
+    default: ""
 
 orbs:
   # https://circleci.com/orbs/registry/orb/circleci/slack
@@ -86,32 +89,32 @@ workflows:
           type: approval
           filters:
             branches:
-              ignore: main
+              ignore: internal
       - build-tests:
-          name: Build MapboxTestHost tests [non-main]
+          name: Build MapboxTestHost tests [non-internal]
           requires:
             - run-tests?
       - run-tests:
-          name: Run MapboxTestHost tests [non-main]
+          name: Run MapboxTestHost tests [non-internal]
           scheme: MapboxTestHost
           requires:
-            - Build MapboxTestHost tests [non-main]
+            - Build MapboxTestHost tests [non-internal]
           devices: --device model=iphone8,version=14.7
 
       - run-examples-tests?:
           type: approval
           filters:
             branches:
-              ignore: main
+              ignore: internal
       - build-examples-tests:
-          name: Build Examples tests [non-main]
+          name: Build Examples tests [non-internal]
           requires:
             - run-examples-tests?
       - run-tests:
-          name: Run Examples tests [non-main]
+          name: Run Examples tests [non-internal]
           scheme: Examples
           requires:
-            - Build Examples tests [non-main]
+            - Build Examples tests [non-internal]
           devices: --device model=iphone8,version=14.7
 
       - trigger-compatibility-verification?:
@@ -150,7 +153,7 @@ workflows:
 #            - build-sdk
 #          filters:
 #            branches:
-#              only: main
+#              only: internal
 
       # Run unit tests on CI simulator
       - unit-test-sdk:
@@ -163,7 +166,7 @@ workflows:
           turf-revision: v2.0.0
 
       # Build all tests with host application
-      # Run on main by default
+      # Run on internal by default
       # Can be approved to run on other branches
       - build-tests:
           name: Build MapboxTestHost tests
@@ -174,10 +177,10 @@ workflows:
             - Build MapboxTestHost tests
           filters:
             branches:
-              only: main
+              only: internal
 
       # Build and Run tests on Examples scheme.
-      # Enabled by-default on 'main' branch
+      # Enabled by-default on 'internal' branch
       # Can be approved on purpose for others
       - build-examples-tests:
           name: Build Examples tests
@@ -188,7 +191,7 @@ workflows:
             - Build Examples tests
           filters:
             branches:
-              only: main
+              only: internal
 
   release:
     jobs:
@@ -254,6 +257,12 @@ workflows:
       - turf-integration:
           name: "Run Unit Tests"
           turf-revision: << pipeline.parameters.turf-revision >>
+
+  sync-with-public-repo:
+    when: << pipeline.parameters.mapbox_sync_branch >>
+    jobs:
+      - sync-with-public-repo:
+          sync_branch: << pipeline.parameters.mapbox_sync_branch >>
 
 # ==============================================================================
 
@@ -357,7 +366,7 @@ jobs:
           name: Trigger binary size test
           command: |
             if [ -n "${CIRCLECI_API_TOKEN_MOBILE_METRICS}" ]; then
-              if [[ $CIRCLE_BRANCH == main ]]; then
+              if [[ $CIRCLE_BRANCH == internal ]]; then
                 curl --fail -X POST --header "Content-Type: application/json" --data "{\"build_parameters\":{\"CIRCLE_JOB\":\"ios-maps-v10-binary-size\",\"SOURCE_HASH\":\"${CIRCLE_SHA1}\",\"SOURCE_NAME\":\"ios-maps-v10\"}}" https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master?circle-token=${CIRCLECI_API_TOKEN_MOBILE_METRICS}
               else
                 curl --fail -X POST --header "Content-Type: application/json" --data "{\"build_parameters\":{\"CIRCLE_JOB\":\"ios-maps-v10-binary-size\",\"SOURCE_HASH\":\"${CIRCLE_SHA1}\",\"SOURCE_NAME\":\"ios-maps-v10\",\"SOURCE_COMPARE_BASELINE\":\"YES\"}}" https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master?circle-token=${CIRCLECI_API_TOKEN_MOBILE_METRICS}
@@ -373,7 +382,7 @@ jobs:
           name: Build metrics tests
           command: |
             if [ -n "${CIRCLECI_API_TOKEN_MOBILE_METRICS}" ]; then
-              if [[ $CIRCLE_BRANCH == main ]]; then
+              if [[ $CIRCLE_BRANCH == internal ]]; then
                 curl --fail -X POST --header "Content-Type: application/json" --data "{\"build_parameters\":{\"CIRCLE_JOB\":\"ios-maps-v10-build\",\"SOURCE_HASH\":\"${CIRCLE_SHA1}\",\"SOURCE_NAME\":\"ios-maps-v10\"}}" https://circleci.com/api/v1.1/project/github/mapbox/mobile-metrics/tree/master?circle-token=${CIRCLECI_API_TOKEN_MOBILE_METRICS}
               else
                 echo "Trying $CIRCLE_BRANCH first:"
@@ -393,12 +402,12 @@ jobs:
       - run:
           name: Run Workflow
           command: |
-            if [[ $CIRCLE_BRANCH == main ]]; then
+            if [[ $CIRCLE_BRANCH == internal ]]; then
               curl -X POST "https://circleci.com/api/v2/project/github/mapbox/mapbox-maps-ios-internal/pipeline" \
                   -H 'Content-Type: application/json' \
                   -H "Circle-Token: $CIRCLECI_API_TOKEN_MAPBOX_MAPS_IOS_INTERNAL" \
                   -d $'{
-                "branch": "main",
+                "branch": "internal",
                 "parameters": {
                   "maps-ios-checkout-reference": "<< pipeline.git.revision >>",
                   "run-tests": true
@@ -409,7 +418,7 @@ jobs:
                 -H 'Content-Type: application/json' \
                 -H "Circle-Token: $CIRCLECI_API_TOKEN_MAPBOX_MAPS_IOS_INTERNAL" \
                 -d $'{
-              "branch": "main",
+              "branch": "internal",
               "parameters": {
                 "maps-ios-checkout-reference": "<< pipeline.git.revision >>"
               }
@@ -420,7 +429,7 @@ jobs:
     <<: *base-job
     steps:
       - run:
-          # TODO: main by default (this is set as a filter), other commits on-demand
+          # TODO: internal by default (this is set as a filter), other commits on-demand
           name: Trigger metrics
           command: |
             if [ -n "${CIRCLECI_API_TOKEN_MOBILE_METRICS}" ]; then
@@ -916,6 +925,27 @@ jobs:
       - turf-report-failure:
           turf-revision: << parameters.turf-revision >>
 
+  sync-with-public-repo:
+    executor: xcode-latest
+    parameters:
+      sync_branch:
+        default: main
+        type: string
+    steps:
+      - checkout
+      - configure-environment
+      - run:
+          name: Set git user name
+          command: |
+            git config --global user.email "mapbox-ci@users.noreply.github.com"
+            git config --global user.name "mapbox-ci"
+      - run:
+          name: Sync the << parameters.sync_branch >> branch from the public repo
+          command: ./scripts/public-sync/ci-sync-with-public-repo.sh << parameters.sync_branch >>
+      - run:
+          name: Create a PR to merge the << parameters.sync_branch >> branch with the private counterpart
+          command: ./scripts/public-sync/ci-create-pr-from-public-repo.sh << parameters.sync_branch >>
+
 # ==============================================================================
 # Reusable commands
 commands:
@@ -1177,7 +1207,7 @@ commands:
           event: fail
           mentions: '@maps-ios'
           template: basic_fail_1
-          branch_pattern: ^(main|release.*)$
+          branch_pattern: ^(internal|release.*)$
 
   report-failure:
     parameters:
@@ -1197,7 +1227,7 @@ commands:
             fi
           when: on_fail
       - slack/notify:
-          branch_pattern: main
+          branch_pattern: internal
           event: fail
           custom: |
             {
