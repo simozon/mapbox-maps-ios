@@ -132,7 +132,7 @@ workflows:
           requires:
             - build-sdk-for-api-compatibility-check
       - create-xcframework
-#      - validate-integrations-for-branch
+      - validate-integrations-for-branch
 
       # Trigger mobile-metrics workflows
 #      - trigger-metrics-v2
@@ -745,7 +745,7 @@ jobs:
       - run: brew install xcodegen
       - run:
           name: Validate SPM and CocoaPods integrations for current branch
-          command: scripts/validate-integrations/validate-integrations.sh -b $CIRCLE_BRANCH
+          command: scripts/validate-integrations/validate-integrations.sh -b $CIRCLE_BRANCH -p
       - store-default-artifacts
 
   validate-integrations:
