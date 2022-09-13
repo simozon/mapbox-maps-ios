@@ -34,7 +34,15 @@ main() {
 
     step "Generate Xcode project with Xcodegen"
     pushd "$SCRIPT_DIR" > /dev/null || exit 1
-    MBX_TOKEN="$(cat ~/.mapbox)" xcodegen
+
+    if [[ $PRIVATE_REPO_RULE == 1 ]]; then
+        MAPS_REPO_URL="git@github.com:mapbox/mapbox-maps-ios-private.git"
+    else
+        MAPS_REPO_URL="https://github.com/mapbox/mapbox-maps-ios.git"
+    fi
+
+    MBX_TOKEN="$(cat ~/.mapbox)" MAPS_REPO_URL="$MAPS_REPO_URL" xcodegen
+
 
     if [[ $BRANCH_RULE == 1 ]]; then
         # Escape '/' and '\' to make Bash and Sed happy
