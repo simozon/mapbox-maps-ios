@@ -39,7 +39,7 @@ main() {
     if [[ $BRANCH_RULE == 1 ]]; then
         # Escape '/' and '\' to make Bash and Sed happy
         if [[ $PRIVATE_REPO_RULE == 1 ]]; then
-            REPO_URL="https:\/\/github.com\/mapbox\/mapbox-maps-ios-private.git"
+            REPO_URL="git@github.com:mapbox\/mapbox-maps-ios-private.git"
         else
             REPO_URL="https:\/\/github.com\/mapbox\/mapbox-maps-ios.git"
         fi
