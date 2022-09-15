@@ -63,6 +63,9 @@ public struct FillExtrusionLayer: Layer {
     /// Transition options for `fillExtrusionPattern`.
     public var fillExtrusionPatternTransition: StyleTransition?
 
+    /// Indicates whether top edges should be rounded when fill-extrusion-edge-radius has a value greater than 0. If false, rounded edges are only applied to the sides. Default is true.
+    public var fillExtrusionRoundedRoof: Value<Bool>?
+
     /// The geometry's offset. Values are [x, y] where negatives indicate left and up (on the flat plane), respectively.
     public var fillExtrusionTranslate: Value<[Double]>?
 
@@ -106,6 +109,7 @@ public struct FillExtrusionLayer: Layer {
         try paintContainer.encodeIfPresent(fillExtrusionOpacityTransition, forKey: .fillExtrusionOpacityTransition)
         try paintContainer.encodeIfPresent(fillExtrusionPattern, forKey: .fillExtrusionPattern)
         try paintContainer.encodeIfPresent(fillExtrusionPatternTransition, forKey: .fillExtrusionPatternTransition)
+        try paintContainer.encodeIfPresent(fillExtrusionRoundedRoof, forKey: .fillExtrusionRoundedRoof)
         try paintContainer.encodeIfPresent(fillExtrusionTranslate, forKey: .fillExtrusionTranslate)
         try paintContainer.encodeIfPresent(fillExtrusionTranslateTransition, forKey: .fillExtrusionTranslateTransition)
         try paintContainer.encodeIfPresent(fillExtrusionTranslateAnchor, forKey: .fillExtrusionTranslateAnchor)
@@ -141,6 +145,7 @@ public struct FillExtrusionLayer: Layer {
             fillExtrusionOpacityTransition = try paintContainer.decodeIfPresent(StyleTransition.self, forKey: .fillExtrusionOpacityTransition)
             fillExtrusionPattern = try paintContainer.decodeIfPresent(Value<ResolvedImage>.self, forKey: .fillExtrusionPattern)
             fillExtrusionPatternTransition = try paintContainer.decodeIfPresent(StyleTransition.self, forKey: .fillExtrusionPatternTransition)
+            fillExtrusionRoundedRoof = try paintContainer.decodeIfPresent(Value<Bool>.self, forKey: .fillExtrusionRoundedRoof)
             fillExtrusionTranslate = try paintContainer.decodeIfPresent(Value<[Double]>.self, forKey: .fillExtrusionTranslate)
             fillExtrusionTranslateTransition = try paintContainer.decodeIfPresent(StyleTransition.self, forKey: .fillExtrusionTranslateTransition)
             fillExtrusionTranslateAnchor = try paintContainer.decodeIfPresent(Value<FillExtrusionTranslateAnchor>.self, forKey: .fillExtrusionTranslateAnchor)
@@ -185,6 +190,7 @@ public struct FillExtrusionLayer: Layer {
         case fillExtrusionOpacityTransition = "fill-extrusion-opacity-transition"
         case fillExtrusionPattern = "fill-extrusion-pattern"
         case fillExtrusionPatternTransition = "fill-extrusion-pattern-transition"
+        case fillExtrusionRoundedRoof = "fill-extrusion-rounded-roof"
         case fillExtrusionTranslate = "fill-extrusion-translate"
         case fillExtrusionTranslateTransition = "fill-extrusion-translate-transition"
         case fillExtrusionTranslateAnchor = "fill-extrusion-translate-anchor"
