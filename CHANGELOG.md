@@ -4,7 +4,7 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## main
 
-## 10.9.0-beta.1 - September 21, 2022
+## 10.9.0-beta.1-private - September 22, 2022
 
 * Expose `ResourceRequest` properties publicly. ([#1548](https://github.com/mapbox/mapbox-maps-ios/pull/1548))
 * Parse GeoJSON data on a background queue. ([#1576](https://github.com/mapbox/mapbox-maps-ios/pull/1576))
