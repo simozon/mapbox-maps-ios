@@ -175,16 +175,19 @@ public struct Puck3DConfiguration: Equatable {
     ///   - model: The `gltf` model to use for the puck.
     ///   - modelScale: The amount to scale the model by.
     ///   - modelRotation: The rotation of the model in euler angles `[lon, lat, z]`.
+    ///   - modelOpacity: The opacity of the model used as the location puck
     ///   - modelCastShadows: Enable/disable shadow casting for the puck model
     ///   - modelReceiveShadows: Enable/disable shadow receiving for the puck model
     @_spi(Experimental) public init(model: Model,
                                     modelScale: Value<[Double]>? = nil,
                                     modelRotation: Value<[Double]>? = nil,
+                                    modelOpacity: Value<Double>? = nil,
                                     modelCastShadows: Value<Bool>? = nil,
                                     modelReceiveShadows: Value<Bool>? = nil) {
         self.model = model
         self.modelScale = modelScale
         self.modelRotation = modelRotation
+        self.modelOpacity = modelOpacity
         self.modelCastShadows = modelCastShadows
         self.modelReceiveShadows = modelReceiveShadows
     }

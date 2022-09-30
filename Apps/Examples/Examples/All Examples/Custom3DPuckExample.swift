@@ -18,6 +18,12 @@ final class Custom3DPuckExample: UIViewController, ExampleProtocol, LocationCons
         }
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+         // The below line is used for internal testing purposes only.
+        finish()
+    }
+
     private func setupExample() {
         addBuildingExtrusions()
 
@@ -79,7 +85,7 @@ final class Custom3DPuckExample: UIViewController, ExampleProtocol, LocationCons
             }
         }
 
-        let configuration = Puck3DConfiguration(model: myModel, modelScale: .expression(scalingExpression), modelRotation: .constant([0.0, 0.0, 180.0]), modelCastShadows: .constant(false))
+        let configuration = Puck3DConfiguration(model: myModel, modelScale: .expression(scalingExpression), modelRotation: .constant([0.0, 0.0, 180.0]), modelOpacity: .constant(0.5), modelCastShadows: .constant(false))
         mapView.location.options.puckType = .puck3D(configuration)
         mapView.location.options.puckBearingSource = .course
 
