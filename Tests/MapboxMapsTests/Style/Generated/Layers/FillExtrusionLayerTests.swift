@@ -1,6 +1,6 @@
 // This file is generated
 import XCTest
-@testable import MapboxMaps
+@_spi(Experimental) @testable import MapboxMaps
 
 final class FillExtrusionLayerTests: XCTestCase {
 
@@ -57,6 +57,7 @@ final class FillExtrusionLayerTests: XCTestCase {
     func testEncodingAndDecodingOfLayoutProperties() {
         var layer = FillExtrusionLayer(id: "test-id")
         layer.visibility = .constant(.visible)
+        layer.fillExtrusionEdgeRadius = Value<Double>.testConstantValue()
 
         var data: Data?
         do {
@@ -73,6 +74,7 @@ final class FillExtrusionLayerTests: XCTestCase {
         do {
             let decodedLayer = try JSONDecoder().decode(FillExtrusionLayer.self, from: validData)
             XCTAssert(decodedLayer.visibility == .constant(.visible))
+            XCTAssert(layer.fillExtrusionEdgeRadius == Value<Double>.testConstantValue())
         } catch {
             XCTFail("Failed to decode FillExtrusionLayer")
         }
@@ -94,6 +96,7 @@ final class FillExtrusionLayerTests: XCTestCase {
        layer.fillExtrusionOpacityTransition = StyleTransition(duration: 10.0, delay: 10.0)
        layer.fillExtrusionPattern = Value<ResolvedImage>.testConstantValue()
        layer.fillExtrusionPatternTransition = StyleTransition(duration: 10.0, delay: 10.0)
+       layer.fillExtrusionRoundedRoof = Value<Bool>.testConstantValue()
        layer.fillExtrusionTranslate = Value<[Double]>.testConstantValue()
        layer.fillExtrusionTranslateTransition = StyleTransition(duration: 10.0, delay: 10.0)
        layer.fillExtrusionTranslateAnchor = Value<FillExtrusionTranslateAnchor>.testConstantValue()
@@ -121,6 +124,7 @@ final class FillExtrusionLayerTests: XCTestCase {
            XCTAssert(layer.fillExtrusionHeight == Value<Double>.testConstantValue())
            XCTAssert(layer.fillExtrusionOpacity == Value<Double>.testConstantValue())
            XCTAssert(layer.fillExtrusionPattern == Value<ResolvedImage>.testConstantValue())
+           XCTAssert(layer.fillExtrusionRoundedRoof == Value<Bool>.testConstantValue())
            XCTAssert(layer.fillExtrusionTranslate == Value<[Double]>.testConstantValue())
            XCTAssert(layer.fillExtrusionTranslateAnchor == Value<FillExtrusionTranslateAnchor>.testConstantValue())
            XCTAssert(layer.fillExtrusionVerticalGradient == Value<Bool>.testConstantValue())
