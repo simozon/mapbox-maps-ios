@@ -9,6 +9,10 @@ Mapbox welcomes participation and contributions from everyone.
 * Reduce location provider heading orientation update frequency. ([#1618](https://github.com/mapbox/mapbox-maps-ios/pull/1618))
 * Expose the list of added view annotations. ([#1621](https://github.com/mapbox/mapbox-maps-ios/pull/1621)
 
+## 10.9.0 - October 19, 2022
+
+* Update to MapboxCoreMaps 10.9.0 and MapboxCommon 23.1.0. ([#1652](https://github.com/mapbox/mapbox-maps-ios/pull/1652))
+
 ## 10.9.0-rc.1 - October 7, 2022
 
 * Fix accuracy ring radius jumping when zooming the map in/out with `.reducedAccuracy` location authorization.([#1625](https://github.com/mapbox/mapbox-maps-ios/pull/1625))
