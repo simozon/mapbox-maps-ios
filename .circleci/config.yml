@@ -115,7 +115,7 @@ workflows:
           scheme: Examples
           requires:
             - Build Examples tests [non-internal]
-          devices: --device model=iphone8,version=14.7
+          devices: --device model=iphone13pro,version=15.7
 
   steve:
     unless: << pipeline.parameters.turf-revision >>
@@ -421,15 +421,20 @@ jobs:
       - run:
           name: Run Workflow
           command: |
-            if [[ $CIRCLE_BRANCH == internal ]]; then
-              curl -X POST "https://circleci.com/api/v2/project/github/mapbox/mapbox-maps-ios-internal/pipeline" \
+            RUN_TESTS=false
+
+            if [[ $CIRCLE_BRANCH == "internal" || -n $CIRCLE_TAG ]]; then
+              RUN_TESTS=true
+            fi
+
+            curl -X POST "https://circleci.com/api/v2/project/github/mapbox/mapbox-maps-ios-internal/pipeline" \
                   -H 'Content-Type: application/json' \
                   -H "Circle-Token: $CIRCLECI_API_TOKEN_MAPBOX_MAPS_IOS_INTERNAL" \
                   -d $'{
                 "branch": "internal",
                 "parameters": {
                   "maps-ios-checkout-reference": "<< pipeline.git.revision >>",
-                  "run-tests": true
+                  "run-tests": '$RUN_TESTS'
                 }
               }'
             else
