@@ -122,7 +122,6 @@ struct MetricsCommand: ParsableCommand {
 
     func generateTestReport(test: PerformanceTest) -> [[String: Any]] {
         let testName = refineTestFunctionName(test.testName)
-        let baseline = baseline.record(forTestName: testName)
         let createdDate = ISO8601DateFormatter.string(from: Date(), timeZone: .current, formatOptions: [.withInternetDateTime])
         let testUUID = UUID()
 
@@ -137,10 +136,6 @@ struct MetricsCommand: ParsableCommand {
 
                 partialResult[metricName] = MetricsCommand.decimalValueFormatter.string(from: value as NSNumber)
                 partialResult[metricName+"_units"] = metric.unitOfMeasurement
-
-                if let baselineMetric = baseline?.metrics[metricName] {
-                    partialResult[metricName + "_baseline"] = baselineMetric
-                }
             }
 
             let report: [String: Any] = [
