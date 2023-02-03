@@ -6,6 +6,7 @@ final class LargeGeoJSONPerformanceExample: UIViewController, ExampleProtocol {
 
     private var mapView: MapView!
     private var routePoints: Feature!
+    private var jsonUpdateCounter = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +23,12 @@ final class LargeGeoJSONPerformanceExample: UIViewController, ExampleProtocol {
         mapView.mapboxMap.onNext(event: .styleLoaded) { [weak self] _ in
             try! self?.setupExample()
         }
+
+        mapView.mapboxMap.onEvery(event: .sourceDataLoaded) { event in
+            if let dataId = event.payload.dataId {
+                print("GeoJsonSource was updated, data-id : \(dataId)")
+            }
+        }
     }
 
     private func setupExample() throws {
@@ -37,7 +44,8 @@ final class LargeGeoJSONPerformanceExample: UIViewController, ExampleProtocol {
         for i in 0..<Self.largeSourceCount {
             var source = GeoJSONSource()
             let sourceId = "source_\(i)"
-            source.data = .feature(routePoints)
+            source.data = .feature(routePoints, dataId: String(jsonUpdateCounter))
+            jsonUpdateCounter += 1
 
             var lineLayer = LineLayer(id: "line_layer_\(i)")
             lineLayer.source = sourceId
@@ -52,7 +60,8 @@ final class LargeGeoJSONPerformanceExample: UIViewController, ExampleProtocol {
 
         var source = GeoJSONSource()
         let sourceId = "source_marker"
-        source.data = .feature(Feature(geometry: Point(cameraCenter).geometry))
+        source.data = .feature(Feature(geometry: Point(cameraCenter).geometry), dataId: String(jsonUpdateCounter))
+        jsonUpdateCounter += 1
 
         try mapView.mapboxMap.style.addSource(source, id: sourceId)
 
@@ -69,7 +78,8 @@ final class LargeGeoJSONPerformanceExample: UIViewController, ExampleProtocol {
     private func loadAdditionalGeoJSON() throws {
         var source = GeoJSONSource()
         let sourceId = "source_\(Self.largeSourceCount)"
-        source.data = .feature(routePoints)
+        source.data = .feature(routePoints, dataId: String(jsonUpdateCounter))
+        jsonUpdateCounter += 1
 
         try mapView.mapboxMap.style.addSource(source, id: sourceId)
 

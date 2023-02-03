@@ -146,6 +146,12 @@ internal final class StyleSourceManager: StyleSourceManagerProtocol {
         }
     }
 
+    private func setStyleGeoJSONSourceDataForSourceId(_ id: String, dataId: String, data: MapboxCoreMaps.GeoJSONSourceData) throws {
+        try handleExpected {
+            return styleManager.__setStyleGeoJSONSourceDataForSourceId(id, dataId: dataId, data: data)
+        }
+    }
+
     // MARK: - Async GeoJSON source data parsing
 
     private func addGeoJSONSource(_ source: GeoJSONSource, id: String) throws {
@@ -161,10 +167,14 @@ internal final class StyleSourceManager: StyleSourceManagerProtocol {
         guard let data = data else { return }
         if case GeoJSONSourceData.empty = data { return }
 
-        applyGeoJSON(data: data, sourceId: id)
+        if case let GeoJSONSourceData.feature(_, myId) = data {
+            applyGeoJSON(data: data, sourceId: id, dataId: myId)
+        } else {
+            applyGeoJSON(data: data, sourceId: id)
+        }
     }
 
-    private func applyGeoJSON(data: GeoJSONSourceData, sourceId id: String) {
+    private func applyGeoJSON(data: GeoJSONSourceData, sourceId id: String, dataId: String? = nil) {
         workItems.removeValue(forKey: id)?.cancel()
 
         // This implementation favors the first submitted task and the last, in case of many work items queuing up -
@@ -175,7 +185,11 @@ internal final class StyleSourceManager: StyleSourceManagerProtocol {
 
             let data = data.coreData
             do {
-                try self?.setStyleGeoJSONSourceDataForSourceId(id, data: data)
+                if let dataId = dataId {
+                    try self?.setStyleGeoJSONSourceDataForSourceId(id, dataId: dataId, data: data)
+                } else {
+                    try self?.setStyleGeoJSONSourceDataForSourceId(id, data: data)
+                }
             } catch {
                 Log.error(forMessage: "Failed to set data for source with id: \(id), error: \(error)")
             }

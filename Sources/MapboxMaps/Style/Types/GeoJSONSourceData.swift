@@ -5,16 +5,16 @@ import Turf
 public enum GeoJSONSourceData: Codable {
 
     /// The `data` property can be a url
-    case url(URL)
+    case url(URL, dataId: String? = nil)
 
     /// The `data` property can be a feature
-    case feature(Feature)
+    case feature(Feature, dataId: String? = nil)
 
     /// The `data` property can be a feature collection
-    case featureCollection(FeatureCollection)
+    case featureCollection(FeatureCollection, dataId: String? = nil)
 
     /// The `data` property can be a geometry with no associated properties.
-    case geometry(Geometry)
+    case geometry(Geometry, dataId: String? = nil)
 
     /// Empty data to be used for initialization
     case empty
@@ -51,13 +51,13 @@ public enum GeoJSONSourceData: Codable {
         var container = encoder.singleValueContainer()
 
         switch self {
-        case .url(let url):
+        case .url(let url, _):
             try container.encode(url)
-        case .feature(let feature):
+        case .feature(let feature, _):
             try container.encode(feature)
-        case .featureCollection(let featureCollection):
+        case .featureCollection(let featureCollection, _):
             try container.encode(featureCollection)
-        case .geometry(let geometry):
+        case .geometry(let geometry, _):
             try container.encode(geometry)
         case .empty:
             try container.encode("")
@@ -66,7 +66,7 @@ public enum GeoJSONSourceData: Codable {
 
     internal func stringValue() throws -> String {
         switch self {
-        case .url(let uRL):
+        case .url(let uRL, _):
             return uRL.absoluteString
         default:
             return try self.toString()
@@ -77,16 +77,16 @@ public enum GeoJSONSourceData: Codable {
 extension GeoJSONSourceData {
     internal var coreData: MapboxCoreMaps.GeoJSONSourceData {
         switch self {
-        case .geometry(let geometry):
+        case .geometry(let geometry, _):
             let geometry = MapboxCommon.Geometry(geometry)
             return .fromGeometry(geometry)
-        case .feature(let feature):
+        case .feature(let feature, _):
             let feature = MapboxCommon.Feature(feature)
             return .fromFeature(feature)
-        case .featureCollection(let collection):
+        case .featureCollection(let collection, _):
             let features = collection.features.map(MapboxCommon.Feature.init)
             return .fromNSArray(features)
-        case .url(let url):
+        case .url(let url, _):
             return .fromNSString(url.absoluteString)
         case .empty:
             return .fromNSString("")
